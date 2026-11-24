@@ -1,0 +1,27 @@
+name: Build & Release
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build universal release & pkg
+        run: |
+          make release
+          make pkg
+
+      - name: Upload release assets on tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/not31-macos-universal.tar.gz
+            dist/not31-*.pkg
+          generate_release_notes: true
